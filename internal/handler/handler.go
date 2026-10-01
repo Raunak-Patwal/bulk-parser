@@ -1,0 +1,50 @@
+package handler
+
+import (
+	"encoding/json"
+	"net/http"
+
+	"bulk-parser/internal/limiter"
+	"bulk-parser/internal/model"
+	"bulk-parser/internal/orchestrator"
+)
+
+type Handler struct {
+	limiter      *limiter.RequestLimiter
+	orchestrator *orchestrator.Orchestrator
+}
+
+func NewHandler(
+	limiter *limiter.RequestLimiter,
+	orchestrator *orchestrator.Orchestrator,
+) *Handler {
+	return &Handler{
+		limiter:      limiter,
+		orchestrator: orchestrator,
+	}
+}
+
+func (h *Handler) Process(w http.ResponseWriter, r *http.Request) {
+
+	h.limiter.Acquire()
+	defer h.limiter.Release()
+
+	var request model.BulkRequest
+
+	err := json.NewDecoder(r.Body).Decode(&request)
+
+	if err != nil {
+		http.Error(
+			w,
+			"invalid request body",
+			http.StatusBadRequest,
+		)
+		return
+	}
+
+	results := h.orchestrator.Process(request)
+
+	w.Header().Set("Content-Type", "application/json")
+
+	json.NewEncoder(w).Encode(results)
+}
