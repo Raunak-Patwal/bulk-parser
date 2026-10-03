@@ -2,68 +2,62 @@ package orchestrator
 
 import (
 	"bulk-parser/internal/model"
-	"bulk-parser/internal/worker"
 	"sync"
 )
 
-type Orchestrator struct {
-	jobs        chan model.Job
-	results     chan model.Result
-	workerCount int
-	wg          sync.WaitGroup
-	workerFunc  wokerFunction
+type task struct {
+	job    model.Job
+	result chan<- model.Result
 }
 
-type wokerFunction func()
+type Orchestrator struct {
+	jobs              chan task
+	workerCount       int
+	wg                sync.WaitGroup
+	processorProvider ProcessorProvider
+}
 
-func newOrchestrator(workercount int, bufferSize int, workerFunc wokerFunction) *Orchestrator {
+func newOrchestrator(workercount int, bufferSize int, processorProvider ProcessorProvider) *Orchestrator {
 	return &Orchestrator{
-		jobs:        make(chan model.Job, bufferSize),
-		results:     make(chan model.Result, bufferSize),
-		workerfunc:  func() {},
-		workerCount: workercount,
+		jobs:              make(chan task, bufferSize),
+		workerCount:       workercount,
+		processorProvider: processorProvider,
 	}
 }
 
 func (o *Orchestrator) Start() {
 	for i := 0; i < o.workerCount; i++ {
-		w := worker.NewWorker()
+		processor := o.processorProvider.Create()
 
 		o.wg.Add(1)
 
 		go func() {
 			defer o.wg.Done()
 
-			w.Start(o.jobs, o.results)
+			for task := range o.jobs {
+				result := processor.Process(task.job)
+				task.result <- result
+			}
 		}()
 	}
 
-	go func() {
-		o.wg.Wait()
-		close(o.results)
-	}()
 }
 
-func (o *Orchestrator) Process(request model.BulkRequest) []model.Result {
+func (o *Orchestrator) Process(jobs []model.Job) []model.Result {
+	results := make(chan model.Result, len(jobs))
 
-	for i, source := range request.Sources {
-
-		job := model.Job{
-			ID:       i + 1,
-			Language: source.Language,
-			Data:     source.Data,
+	for _, job := range jobs {
+		o.jobs <- task{
+			job:    job,
+			result: results,
 		}
-
-		o.jobs <- job
 	}
 
-	close(o.jobs)
+	output := make([]model.Result, 0, len(jobs))
 
-	var results []model.Result
-
-	for result := range o.results {
-		results = append(results, result)
+	for i := 0; i < len(jobs); i++ {
+		output = append(output, <-results)
 	}
 
-	return results
+	return output
 }

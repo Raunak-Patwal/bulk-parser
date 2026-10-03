@@ -26,10 +26,3 @@ func (w *Worker) Process(job model.Job) model.Result {
 
 	return parser.Parse(job)
 }
-
-func (w *Worker) Start(jobs <-chan model.Job, results chan<- model.Result) {
-	for job := range jobs {
-		result := w.Process(job)
-		results <- result
-	}
-}
