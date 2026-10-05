@@ -1,46 +1,46 @@
 package main
 
 import (
-	"fmt"
-	"sync"
-	"time"
+	"log"
+	"net/http"
 
+	"bulk-parser/internal/factory"
+	"bulk-parser/internal/handler"
 	"bulk-parser/internal/limiter"
 	"bulk-parser/internal/orchestrator"
+	"bulk-parser/internal/worker"
 )
 
 func main() {
-	maxRequests := 5
 
-	requestLimiter := limiter.NewRequestLimiter(maxRequests)
+	// Parser dependencies
+	parserFactory := factory.Newparsefactory()
 
-	var wg sync.WaitGroup
+	// Worker dependency
+	processorProvider := worker.NewProvider(parserFactory)
 
-	orch := orchestrator.NewOrchestrator(5, 20, process)
+	orch := orchestrator.NewOrchestrator(
+		5,
+		20,
+		processorProvider,
+	)
 
-	for i := 1; i <= 10; i++ {
-		wg.Add(1)
+	orch.Start()
 
-		go func(requestID int) {
-			defer wg.Done()
+	requestLimiter := limiter.NewRequestLimiter(5)
 
-			requestLimiter.Acquire()
+	h := handler.NewHandler(
+		requestLimiter,
+		orch,
+	)
 
-			fmt.Printf("Request %d STARTED\n", requestID)
+	mux := http.NewServeMux()
+	mux.HandleFunc("/process", h.Process)
 
-			time.Sleep(3 * time.Second)
+	log.Println("server running on :8081")
 
-			fmt.Printf("Request %d FINISHED\n", requestID)
-
-			requestLimiter.Release()
-		}(i)
+	err := http.ListenAndServe(":8081", mux)
+	if err != nil {
+		log.Fatal(err)
 	}
-
-	wg.Wait()
-
-	fmt.Println("All requests finished")
-}
-
-func process(request string) string {
-	print("hi")
 }

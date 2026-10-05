@@ -17,7 +17,7 @@ type Orchestrator struct {
 	processorProvider ProcessorProvider
 }
 
-func newOrchestrator(workercount int, bufferSize int, processorProvider ProcessorProvider) *Orchestrator {
+func NewOrchestrator(workercount int, bufferSize int, processorProvider ProcessorProvider) *Orchestrator {
 	return &Orchestrator{
 		jobs:              make(chan task, bufferSize),
 		workerCount:       workercount,

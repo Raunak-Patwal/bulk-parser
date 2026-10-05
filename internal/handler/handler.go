@@ -42,7 +42,17 @@ func (h *Handler) Process(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	results := h.orchestrator.Process(request)
+	jobs := make([]model.Job, 0, len(request.Sources))
+
+	for i, source := range request.Sources {
+		jobs = append(jobs, model.Job{
+			ID:       i + 1,
+			Language: source.Language,
+			Data:     source.Data,
+		})
+	}
+
+	results := h.orchestrator.Process(jobs)
 
 	w.Header().Set("Content-Type", "application/json")
 
