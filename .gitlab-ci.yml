@@ -25,3 +25,13 @@ deploy_job:
     script:
         - echo "this"
         - echo "is deploying"
+
+dev_test_job: 
+    stage: test
+    script: 
+        - echo "tested for dev"
+
+prod_test_job: 
+    stage: test
+    script: 
+        - echo "tested for prod"
