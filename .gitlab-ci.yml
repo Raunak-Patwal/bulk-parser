@@ -1,0 +1,27 @@
+stages:
+    - build
+    - test
+    - push
+    - deploy
+
+build_job:
+    stage: build
+    script: 
+        - echo "this build is done using command <docker build -t tag.>"
+    
+test_job:
+    stage: test
+    script: 
+        - echo "this is testing of out docker build"
+
+push_job: 
+    stage: push
+    script: 
+        - echo "this"
+        - echo "is pushing to docker hub "
+
+deploy_job: 
+    stage : deploy
+        - echo "this"
+        - echo "is deploying"
+
