@@ -1,3 +1,4 @@
+```yaml
 stages:
     - build
     - test
@@ -6,22 +7,23 @@ stages:
 
 build_job:
     stage: build
-    script: 
-        - echo "this build is done using command <docker build -t tag.>"
-    
+    script:
+        - echo "this build is done using command docker build -t tag"
+
 test_job:
     stage: test
-    script: 
-        - echo "this is testing of out docker build"
+    script:
+        - echo "this is testing of our docker build"
 
-push_job: 
+push_job:
     stage: push
-    script: 
+    script:
         - echo "this"
-        - echo "is pushing to docker hub "
+        - echo "is pushing to docker hub"
 
-deploy_job: 
-    stage : deploy
+deploy_job:
+    stage: deploy
+    script:
         - echo "this"
         - echo "is deploying"
-
+```
