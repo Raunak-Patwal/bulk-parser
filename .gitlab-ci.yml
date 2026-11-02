@@ -47,7 +47,7 @@ deploy_job:
 dev_test_job: 
     stage: test
     script: 
-        - echo "tested for dev"
+        - echo "tested for devl"
     tags:
         - dev
     
