@@ -1,0 +1,15 @@
+stages:
+  - validate
+
+validate:
+  stage: validate
+  tags:
+    - dev
+  script:
+    - echo "Checking Go installation..."
+    - go version
+    - echo "Checking Docker..."
+    - docker --version
+    - echo "Checking Docker Compose..."
+    - docker compose version
+    - echo "Runner environment is ready!"
