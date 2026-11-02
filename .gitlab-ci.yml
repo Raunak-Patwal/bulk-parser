@@ -24,7 +24,7 @@ deploy_job:
     stage: deploy
     script:
         - echo "this"
-        - echo "is deploying"
+        - echo "is deploying to EC2 instance for $DOCKERHUB_USER"
 
 dev_test_job: 
     stage: test
