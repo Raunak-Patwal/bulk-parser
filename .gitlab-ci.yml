@@ -13,6 +13,7 @@ test_job:
     stage: test
     script:
         - echo "this is testing of our docker build"
+        - mkdir -p logs
         - echo "these are my test results">logs/app.log
     artifacts:
         paths:
@@ -25,7 +26,7 @@ push_job:
     script:
         - echo "this"
         - echo "is pushing to docker hub"
-        - mkdir -p logs
+        
 
 deploy_job:
     stage: deploy
