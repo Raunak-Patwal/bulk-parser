@@ -8,6 +8,8 @@ build_job:
     stage: build
     script:
         - echo "this build is done using command docker build -t tag"
+    tags:
+       - dev
 
 test_job:
     stage: test
@@ -19,14 +21,16 @@ test_job:
         paths:
             - "logs/"
         expire_in: 30 days
-       
+    tags:
+        - dev
 
 push_job:
     stage: push
     script:
         - echo "this"
         - echo "is pushing to docker hub"
-        
+    tags:
+        - dev
 
 deploy_job:
     stage: deploy
@@ -37,13 +41,20 @@ deploy_job:
     artifacts:
         paths:
             - "logs/"
+    tags:
+        - dev
 
 dev_test_job: 
     stage: test
     script: 
         - echo "tested for dev"
+    tags:
+        - dev
+    
 
 prod_test_job: 
     stage: test
     script: 
         - echo "tested for prod"
+    tags:
+        - dev
