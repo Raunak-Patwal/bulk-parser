@@ -13,6 +13,12 @@ test_job:
     stage: test
     script:
         - echo "this is testing of our docker build"
+        - echo "these are my test results">logs/app.log
+    artifacts:
+        paths:
+            - "logs/"
+        expire_in: 30 days
+       
 
 push_job:
     stage: push
@@ -25,6 +31,10 @@ deploy_job:
     script:
         - echo "this"
         - echo "is deploying to EC2 instance for $DOCKERHUB_USER"
+        - echo "this log is from $CI_JOB_STAGE>>logs/app.log"
+    artifacts:
+        paths:
+            - "logs/"
 
 dev_test_job: 
     stage: test
