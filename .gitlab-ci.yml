@@ -15,12 +15,23 @@ validate:
     - docker compose version
     - echo "Runner environment is ready!"
 
-build:
-  stage: build
+docker-build-push:
+  stage: docker
   tags:
     - dev
   script:
+    - echo "Logging into Docker Hub..."
+    - docker login -u "$DOCKERHUB_USERNAME" --password-stdin <<< $"DOCKERHUB_TOKEN"
     - echo "Building docker image..."
-    - docker build -t bulk-parser:$CI_COMMIT_SHORT_SHA .
-    - echo "Docker image built successfully"
-    - docker images bulk-parser
+    - docker build -t "$DOCKERHUB_USERNAME/bulk-parser:$CI_COMMIT_SHORT_SHA"-t "$DOCKERHUB_USERNAME/bulk-parser:latest" .
+
+    - echo "Pushing commit-specific image..."
+    - docker push "$DOCKERHUB_USERNAME/bulk-parser:$CI_COMMIT_SHORT_SHA"
+
+    - | 
+    if [ "$CI_COMMIT_BRANCH" = "main" ]; then
+    echo "Pushing latest image..."
+    docker push "$DOCKERHUB_USERNAME/bulk-parser:latest"
+    fi
+
+   - echo "Docker image published successfully!"
