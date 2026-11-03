@@ -13,8 +13,8 @@ validate:
     - docker --version
     - echo "Checking Docker Compose..."
     - docker compose version
-    - echo "Runner environment is ready!
-    "
+    - echo "Runner environment is ready!"
+    
 
 build:
   stage: build
