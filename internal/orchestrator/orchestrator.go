@@ -44,7 +44,7 @@ func (o *Orchestrator) Start() {
 					"[WORKER %d] PICKED JobID=%d | Queue remaining=%d",
 					workerID,
 					task.job.ID,
-					task.job.Data,
+					len(o.jobs),
 				)
 
 				start := time.Now()
@@ -54,7 +54,6 @@ func (o *Orchestrator) Start() {
 					"[WORKER %d] COMPLETED JobID=%d | Duration=%v | Error=%v",
 					workerID,
 					task.job.ID,
-					task.job.Data,
 					time.Since(start),
 					result.Error,
 				)

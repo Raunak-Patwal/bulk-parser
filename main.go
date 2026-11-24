@@ -48,29 +48,27 @@ func main() {
 	mux.HandleFunc("/process", h.Process)
 
 	// Health check endpoint
-        mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 
-        if r.Method != http.MethodGet {
-            http.Error(
-                w,
-               "method not allowed",
-               http.StatusMethodNotAllowed,
-         )
-        return
-       }
+		if r.Method != http.MethodGet {
+			http.Error(
+				w,
+				"method not allowed",
+				http.StatusMethodNotAllowed,
+			)
+			return
+		}
 
-       w.WriteHeader(http.StatusOK)
+		w.WriteHeader(http.StatusOK)
 
-       w.Write([]byte("ok"))
-       })
+		w.Write([]byte("ok"))
+	})
 
 	// 8. Create HTTP server
 	server := &http.Server{
 		Addr:    ":8081",
 		Handler: mux,
 	}
-
-
 
 	// 9. Start HTTP server
 	go func() {
